@@ -18,47 +18,43 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: SatisfactionSurveyForm(),
+      home: RegistrationForm(),
     );
   }
 }
 
-class SatisfactionSurveyForm extends StatefulWidget {
+class RegistrationForm extends StatefulWidget {
   @override
-  _SatisfactionSurveyFormState createState() => _SatisfactionSurveyFormState();
+  _RegistrationFormState createState() => _RegistrationFormState();
 }
 
-class _SatisfactionSurveyFormState extends State<SatisfactionSurveyForm> {
+class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _commentController = TextEditingController();
-  double _rating = 3;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       String name = _nameController.text;
-      String comment = _commentController.text;
+      String email = _emailController.text;
+      String password = _passwordController.text;
 
       print("Nombre: $name");
-      print("Nivel de Satisfacción: $_rating estrellas");
-      print("Comentario: $comment");
+      print("Email: $email");
+      print("Contraseña: $password");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Encuesta enviada con éxito')),
+        SnackBar(content: Text('Registro exitoso')),
       );
-
-      _nameController.clear();
-      _commentController.clear();
-      setState(() {
-        _rating = 3;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Encuesta de Satisfacción')),
+      appBar: AppBar(title: Text('Registro')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -87,36 +83,39 @@ class _SatisfactionSurveyFormState extends State<SatisfactionSurveyForm> {
                               value!.isEmpty ? 'Ingrese su nombre' : null,
                         ),
                         SizedBox(height: 10),
-                        Text('Nivel de Satisfacción',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        RatingBar.builder(
-                          initialRating: _rating,
-                          minRating: 1,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemBuilder: (context, _) => Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          onRatingUpdate: (rating) {
-                            setState(() {
-                              _rating = rating;
-                            });
-                          },
-                        ),
-                        SizedBox(height: 10),
-                        Text('Comentarios',
+                        Text('Email',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _commentController,
-                          maxLines: 4,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
                           validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su comentario' : null,
+                              value!.isEmpty ? 'Ingrese su email' : null,
+                        ),
+                        SizedBox(height: 10),
+                        Text('Contraseña',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                          ),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su contraseña' : null,
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -127,7 +126,7 @@ class _SatisfactionSurveyFormState extends State<SatisfactionSurveyForm> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text('Enviar'),
+                          child: Text('Registrarse'),
                         ),
                       ],
                     ),
