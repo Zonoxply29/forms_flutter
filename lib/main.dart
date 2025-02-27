@@ -1,7 +1,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'dart:ui' as ui;
 
 void main() {
@@ -18,64 +18,47 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: HotelReservationForm(),
+      home: SatisfactionSurveyForm(),
     );
   }
 }
 
-class HotelReservationForm extends StatefulWidget {
+class SatisfactionSurveyForm extends StatefulWidget {
   @override
-  _HotelReservationFormState createState() => _HotelReservationFormState();
+  _SatisfactionSurveyFormState createState() => _SatisfactionSurveyFormState();
 }
 
-class _HotelReservationFormState extends State<HotelReservationForm> {
+class _SatisfactionSurveyFormState extends State<SatisfactionSurveyForm> {
   final _formKey = GlobalKey<FormState>();
-  DateTime? _checkInDate;
-  DateTime? _checkOutDate;
-  int _guests = 1;
-
-  Future<void> _selectDate(BuildContext context, bool isCheckIn) async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 365)),
-    );
-    if (pickedDate != null) {
-      setState(() {
-        if (isCheckIn) {
-          _checkInDate = pickedDate;
-        } else {
-          _checkOutDate = pickedDate;
-        }
-      });
-    }
-  }
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
+  double _rating = 3;
 
   void _submitForm() {
-    if (_checkInDate != null && _checkOutDate != null) {
-      print(
-          "Fecha de Entrada: ${_checkInDate!.toLocal().toString().split(' ')[0]}");
-      print(
-          "Fecha de Salida: ${_checkOutDate!.toLocal().toString().split(' ')[0]}");
-      print("Número de Huéspedes: $_guests");
+    if (_formKey.currentState!.validate()) {
+      String name = _nameController.text;
+      String comment = _commentController.text;
+
+      print("Nombre: $name");
+      print("Nivel de Satisfacción: $_rating estrellas");
+      print("Comentario: $comment");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Reserva realizada con éxito')),
+        SnackBar(content: Text('Encuesta enviada con éxito')),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('Por favor seleccione las fechas de entrada y salida')),
-      );
+
+      _nameController.clear();
+      _commentController.clear();
+      setState(() {
+        _rating = 3;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Reserva de Hotel')),
+      appBar: AppBar(title: Text('Encuesta de Satisfacción')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -93,50 +76,47 @@ class _HotelReservationFormState extends State<HotelReservationForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Fecha de Entrada',
+                        Text('Nombre',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
-                        ElevatedButton(
-                          onPressed: () => _selectDate(context, true),
-                          child: Text(_checkInDate == null
-                              ? 'Seleccionar Fecha'
-                              : _checkInDate!
-                                  .toLocal()
-                                  .toString()
-                                  .split(' ')[0]),
-                        ),
-                        SizedBox(height: 10),
-                        Text('Fecha de Salida',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        ElevatedButton(
-                          onPressed: () => _selectDate(context, false),
-                          child: Text(_checkOutDate == null
-                              ? 'Seleccionar Fecha'
-                              : _checkOutDate!
-                                  .toLocal()
-                                  .toString()
-                                  .split(' ')[0]),
-                        ),
-                        SizedBox(height: 10),
-                        Text('Número de Huéspedes',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        DropdownButtonFormField<int>(
-                          value: _guests,
+                        TextFormField(
+                          controller: _nameController,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
-                          items: List.generate(10, (index) => index + 1)
-                              .map((num) => DropdownMenuItem(
-                                    value: num,
-                                    child: Text(num.toString()),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su nombre' : null,
+                        ),
+                        SizedBox(height: 10),
+                        Text('Nivel de Satisfacción',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        RatingBar.builder(
+                          initialRating: _rating,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {
                             setState(() {
-                              _guests = value!;
+                              _rating = rating;
                             });
                           },
+                        ),
+                        SizedBox(height: 10),
+                        Text('Comentarios',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextFormField(
+                          controller: _commentController,
+                          maxLines: 4,
+                          decoration:
+                              InputDecoration(border: OutlineInputBorder()),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su comentario' : null,
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -147,7 +127,7 @@ class _HotelReservationFormState extends State<HotelReservationForm> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text('Reservar'),
+                          child: Text('Enviar'),
                         ),
                       ],
                     ),
