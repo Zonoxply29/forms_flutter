@@ -17,46 +17,46 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: PaymentForm(),
+      home: CommentForm(),
     );
   }
 }
 
-class PaymentForm extends StatefulWidget {
+class CommentForm extends StatefulWidget {
   @override
-  _PaymentFormState createState() => _PaymentFormState();
+  _CommentFormState createState() => _CommentFormState();
 }
 
-class _PaymentFormState extends State<PaymentForm> {
+class _CommentFormState extends State<CommentForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _cardNumberController = TextEditingController();
-  final TextEditingController _expiryDateController = TextEditingController();
-  final TextEditingController _cvvController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      String cardNumber = _cardNumberController.text;
-      String expiryDate = _expiryDateController.text;
-      String cvv = _cvvController.text;
+      String name = _nameController.text;
+      String email = _emailController.text;
+      String comment = _commentController.text;
 
-      print("Número de tarjeta: $cardNumber");
-      print("Fecha de expiración: $expiryDate");
-      print("CVV: $cvv");
+      print("Nombre: $name");
+      print("Email: $email");
+      print("Comentario: $comment");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pago procesado con éxito')),
+        SnackBar(content: Text('Comentario enviado con éxito')),
       );
 
-      _cardNumberController.clear();
-      _expiryDateController.clear();
-      _cvvController.clear();
+      _nameController.clear();
+      _emailController.clear();
+      _commentController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Formulario de Pago')),
+      appBar: AppBar(title: Text('Dejar un Comentario')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -74,48 +74,39 @@ class _PaymentFormState extends State<PaymentForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Número de Tarjeta',
+                        Text('Nombre',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _cardNumberController,
-                          keyboardType: TextInputType.number,
-                          maxLength: 12,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(), counterText: ""),
-                          validator: (value) => value!.length != 12
-                              ? 'Ingrese un número de tarjeta válido (12 dígitos)'
-                              : null,
+                          controller: _nameController,
+                          decoration:
+                              InputDecoration(border: OutlineInputBorder()),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su nombre' : null,
                         ),
                         SizedBox(height: 10),
-                        Text('Fecha de Expiración (MM/AA)',
+                        Text('Email',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _expiryDateController,
-                          keyboardType: TextInputType.datetime,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(), hintText: 'MM/AA'),
-                          validator: (value) => value!.isEmpty ||
-                                  !RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$')
-                                      .hasMatch(value)
-                              ? 'Formato inválido (MM/AA)'
-                              : null,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration:
+                              InputDecoration(border: OutlineInputBorder()),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su email' : null,
                         ),
                         SizedBox(height: 10),
-                        Text('CVV',
+                        Text('Comentario',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _cvvController,
-                          keyboardType: TextInputType.number,
-                          obscureText: true,
-                          maxLength: 3,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(), counterText: ""),
-                          validator: (value) => value!.length != 3
-                              ? 'Ingrese un CVV válido (3 dígitos)'
-                              : null,
+                          controller: _commentController,
+                          maxLines: 4,
+                          decoration:
+                              InputDecoration(border: OutlineInputBorder()),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Ingrese su comentario' : null,
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -126,7 +117,7 @@ class _PaymentFormState extends State<PaymentForm> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text('Pagar'),
+                          child: Text('Enviar'),
                         ),
                       ],
                     ),
