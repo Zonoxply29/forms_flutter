@@ -17,47 +17,46 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: EventRegistrationForm(),
+      home: PaymentForm(),
     );
   }
 }
 
-class EventRegistrationForm extends StatefulWidget {
+class PaymentForm extends StatefulWidget {
   @override
-  _EventRegistrationFormState createState() => _EventRegistrationFormState();
+  _PaymentFormState createState() => _PaymentFormState();
 }
 
-class _EventRegistrationFormState extends State<EventRegistrationForm> {
+class _PaymentFormState extends State<PaymentForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  String _attendance = "Sí";
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _cvvController = TextEditingController();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      String name = _nameController.text;
-      String email = _emailController.text;
+      String cardNumber = _cardNumberController.text;
+      String expiryDate = _expiryDateController.text;
+      String cvv = _cvvController.text;
 
-      print("Nombre: $name");
-      print("Email: $email");
-      print("Asistirá al evento: $_attendance");
+      print("Número de tarjeta: $cardNumber");
+      print("Fecha de expiración: $expiryDate");
+      print("CVV: $cvv");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Inscripción enviada con éxito')),
+        SnackBar(content: Text('Pago procesado con éxito')),
       );
 
-      _nameController.clear();
-      _emailController.clear();
-      setState(() {
-        _attendance = "Sí";
-      });
+      _cardNumberController.clear();
+      _expiryDateController.clear();
+      _cvvController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Formulario de Inscripción')),
+      appBar: AppBar(title: Text('Formulario de Pago')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -75,60 +74,48 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Nombre',
+                        Text('Número de Tarjeta',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _nameController,
-                          decoration:
-                              InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su nombre' : null,
+                          controller: _cardNumberController,
+                          keyboardType: TextInputType.number,
+                          maxLength: 12,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(), counterText: ""),
+                          validator: (value) => value!.length != 12
+                              ? 'Ingrese un número de tarjeta válido (12 dígitos)'
+                              : null,
                         ),
                         SizedBox(height: 10),
-                        Text('Email',
+                        Text('Fecha de Expiración (MM/AA)',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration:
-                              InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su email' : null,
+                          controller: _expiryDateController,
+                          keyboardType: TextInputType.datetime,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(), hintText: 'MM/AA'),
+                          validator: (value) => value!.isEmpty ||
+                                  !RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$')
+                                      .hasMatch(value)
+                              ? 'Formato inválido (MM/AA)'
+                              : null,
                         ),
                         SizedBox(height: 10),
-                        Text('¿Asistirá al evento?',
+                        Text('CVV',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: Text('Sí'),
-                                value: "Sí",
-                                groupValue: _attendance,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _attendance = value!;
-                                  });
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: Text('No'),
-                                value: "No",
-                                groupValue: _attendance,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _attendance = value!;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
+                        TextFormField(
+                          controller: _cvvController,
+                          keyboardType: TextInputType.number,
+                          obscureText: true,
+                          maxLength: 3,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(), counterText: ""),
+                          validator: (value) => value!.length != 3
+                              ? 'Ingrese un CVV válido (3 dígitos)'
+                              : null,
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -139,7 +126,7 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text('Inscribirse'),
+                          child: Text('Pagar'),
                         ),
                       ],
                     ),
