@@ -17,42 +17,39 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: PreferencesSurveyForm(),
+      home: ProductSearchForm(),
     );
   }
 }
 
-class PreferencesSurveyForm extends StatefulWidget {
+class ProductSearchForm extends StatefulWidget {
   @override
-  _PreferencesSurveyFormState createState() => _PreferencesSurveyFormState();
+  _ProductSearchFormState createState() => _ProductSearchFormState();
 }
 
-class _PreferencesSurveyFormState extends State<PreferencesSurveyForm> {
+class _ProductSearchFormState extends State<ProductSearchForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _colorController = TextEditingController();
-  final TextEditingController _foodController = TextEditingController();
+  final TextEditingController _productNameController = TextEditingController();
+  String _selectedCategory = 'Electrónica';
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      String color = _colorController.text;
-      String food = _foodController.text;
+      String productName = _productNameController.text;
+      String category = _selectedCategory;
 
-      print("Color Favorito: $color");
-      print("Comida Favorita: $food");
+      print("Producto a buscar: $productName");
+      print("Categoría: $category");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Encuesta enviada con éxito')),
+        SnackBar(content: Text('Búsqueda enviada con éxito')),
       );
-
-      _colorController.clear();
-      _foodController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Encuesta de Preferencias')),
+      appBar: AppBar(title: Text('Búsqueda de Productos')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -70,28 +67,36 @@ class _PreferencesSurveyFormState extends State<PreferencesSurveyForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Color Favorito',
+                        Text('Nombre del Producto',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _colorController,
+                          controller: _productNameController,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
                           validator: (value) => value!.isEmpty
-                              ? 'Ingrese su color favorito'
+                              ? 'Ingrese el nombre del producto'
                               : null,
                         ),
                         SizedBox(height: 10),
-                        Text('Comida Favorita',
+                        Text('Categoría',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
-                        TextFormField(
-                          controller: _foodController,
+                        DropdownButtonFormField<String>(
+                          value: _selectedCategory,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) => value!.isEmpty
-                              ? 'Ingrese su comida favorita'
-                              : null,
+                          items: ['Electrónica', 'Ropa', 'Hogar']
+                              .map((category) => DropdownMenuItem(
+                                    value: category,
+                                    child: Text(category),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value!;
+                            });
+                          },
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -102,7 +107,7 @@ class _PreferencesSurveyFormState extends State<PreferencesSurveyForm> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text('Enviar'),
+                          child: Text('Buscar'),
                         ),
                       ],
                     ),
