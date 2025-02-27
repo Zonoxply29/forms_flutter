@@ -17,46 +17,42 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: CommentForm(),
+      home: PreferencesSurveyForm(),
     );
   }
 }
 
-class CommentForm extends StatefulWidget {
+class PreferencesSurveyForm extends StatefulWidget {
   @override
-  _CommentFormState createState() => _CommentFormState();
+  _PreferencesSurveyFormState createState() => _PreferencesSurveyFormState();
 }
 
-class _CommentFormState extends State<CommentForm> {
+class _PreferencesSurveyFormState extends State<PreferencesSurveyForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _colorController = TextEditingController();
+  final TextEditingController _foodController = TextEditingController();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      String name = _nameController.text;
-      String email = _emailController.text;
-      String comment = _commentController.text;
+      String color = _colorController.text;
+      String food = _foodController.text;
 
-      print("Nombre: $name");
-      print("Email: $email");
-      print("Comentario: $comment");
+      print("Color Favorito: $color");
+      print("Comida Favorita: $food");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Comentario enviado con éxito')),
+        SnackBar(content: Text('Encuesta enviada con éxito')),
       );
 
-      _nameController.clear();
-      _emailController.clear();
-      _commentController.clear();
+      _colorController.clear();
+      _foodController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Dejar un Comentario')),
+      appBar: AppBar(title: Text('Encuesta de Preferencias')),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -74,39 +70,28 @@ class _CommentFormState extends State<CommentForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Nombre',
+                        Text('Color Favorito',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _nameController,
+                          controller: _colorController,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su nombre' : null,
+                          validator: (value) => value!.isEmpty
+                              ? 'Ingrese su color favorito'
+                              : null,
                         ),
                         SizedBox(height: 10),
-                        Text('Email',
+                        Text('Comida Favorita',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
+                          controller: _foodController,
                           decoration:
                               InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su email' : null,
-                        ),
-                        SizedBox(height: 10),
-                        Text('Comentario',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        TextFormField(
-                          controller: _commentController,
-                          maxLines: 4,
-                          decoration:
-                              InputDecoration(border: OutlineInputBorder()),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Ingrese su comentario' : null,
+                          validator: (value) => value!.isEmpty
+                              ? 'Ingrese su comida favorita'
+                              : null,
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
